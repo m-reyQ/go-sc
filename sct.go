@@ -24,7 +24,7 @@ package sct
 // RRCrtc crtcxid(RRCrtc * crtcs, int i) {
 //	 return crtcs[i];
 // }
-// void ushortSet(ushort * s, int k, double v) {
+// void ushortSet(ushort * s, int k, ushort v) {
 //	 s[k] = (ushort)v;
 // }
 import "C"
@@ -58,6 +58,7 @@ var whitepoints = []color{
 	{0.77442176, 0.85453121, 1.00000000},
 }
 
+// SetColorTemp changes the Xrandr colors to reflect the specified color temperature.
 func SetColorTemp(temp int) {
 	dpy := C.XOpenDisplay(nil)
 	screen := C.DefaultScreenMacro(dpy)
@@ -82,9 +83,9 @@ func SetColorTemp(temp int) {
 		crtc_gamma := C.XRRAllocGamma(size)
 		for i := C.int(0); i < size; i++ {
 			g := 65535.0 * float64(i) / float64(size)
-			C.ushortSet(crtc_gamma.red, i, C.double(g*gammar))
-			C.ushortSet(crtc_gamma.green, i, C.double(g*gammag))
-			C.ushortSet(crtc_gamma.blue, i, C.double(g*gammab))
+			C.ushortSet(crtc_gamma.red, i, C.ushort(g*gammar))
+			C.ushortSet(crtc_gamma.green, i, C.ushort(g*gammag))
+			C.ushortSet(crtc_gamma.blue, i, C.ushort(g*gammab))
 		}
 		C.XRRSetCrtcGamma(dpy, crtcxid, crtc_gamma)
 		C.XFree(unsafe.Pointer(crtc_gamma))
