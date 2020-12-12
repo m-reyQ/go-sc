@@ -19,3 +19,5 @@ http://devdungeon.com/content/ip-geolocation-go
 
 ## License
 go-sct is licensed under the MIT license. `geoip` and `sct` are copyrighted by their respective owners.
+
+Made by [Tristan Rice](https://fn.lc).
