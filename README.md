@@ -5,10 +5,10 @@ A color temperature setting library and CLI that operates in a similar way to f.
 The command line app automatically determines your location using GeoIP and adjusts the color temperature depending on time.
 
 ```sh
-# go install github.com/d4l3k/go-sct/sct
+$ go install github.com/d4l3k/go-sct/sct
 
-# sct // Launch in background
-# sct 3000 // One time temperature change. Temperature must be 1000-10000.
+$ sct # Launch in background
+$ sct 3000 # One time temperature change. Temperature must be 1000-10000.
 ```
 This requires Go and the Xrandr library.
 
