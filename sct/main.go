@@ -30,7 +30,6 @@ func monitorTime() {
 	for {
 		rise := astrotime.NextSunrise(time.Now(), geo.Lat, -geo.Lon)
 		set := astrotime.NextSunset(time.Now(), geo.Lat, -geo.Lon)
-		log.Printf("Rise %s set %s", rise, set)
 		state := rise.Before(set)
 		if lastState != nil && state == *lastState {
 			time.Sleep(1 * time.Minute)
