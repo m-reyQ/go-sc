@@ -51,7 +51,7 @@ func main() {
 	flag.Parse()
 	args := flag.Args()
 	if len(args) == 1 {
-		if temp, err := strconv.Atoi(args[1]); err == nil {
+		if temp, err := strconv.Atoi(args[0]); err == nil {
 			sct.SetColorTemp(temp)
 		}
 	} else if len(args) == 0 {
