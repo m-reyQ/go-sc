@@ -12,6 +12,20 @@ $ sct 3000 # One time temperature change. Temperature must be 1000-10000.
 ```
 This requires Go and the Xrandr library.
 
+## Windows
+By default, the lowest color temperature allowed is around 4500K. More
+information is available [here](http://jonls.dk/2010/09/windows-gamma-adjustments/)
+
+There is a workaround to allow all possible adjustments by alterting the registry.
+
+```
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ICM]
+"GdiIcmGammaRange"=dword:00000100
+```
+Save the above as a file with a ".reg" extension and double click to apply.
+
 ## Credit
 Setting the color temperature uses a port of [sct](http://www.tedunangst.com/flak/post/sct-set-color-temperature) in Go. Credit goes to him for figuring out how to do this.
 
