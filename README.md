@@ -10,7 +10,7 @@ $ go install github.com/d4l3k/go-sct/sct
 $ sct # Launch in background
 $ sct 3000 # One time temperature change. Temperature must be 1000-10000.
 ```
-This requires Go and the Xrandr library.
+This requires Go and (the Xrandr library or Windows).
 
 ## Windows
 By default, the lowest color temperature allowed is around 4500K. More
