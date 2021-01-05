@@ -31,23 +31,13 @@ import "C"
 import "unsafe"
 
 // setColorTemp changes the Xrandr colors to reflect the specified color temperature.
-func setColorTemp(temp int) {
+func setColorTemp(gammar, gammag, gammab float64) {
 	dpy := C.XOpenDisplay(nil)
 	screenCount := C.screenCount(dpy)
 	for screen := C.int(0); screen < screenCount; screen++ {
 		root := C.RootWindowMacro(dpy, screen)
 
 		res := C.XRRGetScreenResourcesCurrent(dpy, root)
-
-		if temp < 1000 || temp > 10000 {
-			temp = 6500
-		}
-		temp -= 1000
-		ratio := float64((temp-1000)%500) / 500.0
-		point := whitepoints[temp/500]
-		gammar := point.r*(1-ratio) + point.r*ratio
-		gammag := point.g*(1-ratio) + point.g*ratio
-		gammab := point.b*(1-ratio) + point.b*ratio
 
 		for c := C.int(0); c < res.ncrtc; c++ {
 			crtcxid := C.crtcxid(res.crtcs, c)
