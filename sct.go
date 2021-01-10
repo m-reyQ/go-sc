@@ -36,8 +36,9 @@ func SetColorTemp(temp int) {
 	temp -= 1000
 	ratio := float64((temp-1000)%500) / 500.0
 	point := whitepoints[temp/500]
-	gammar := point.r*(1-ratio) + point.r*ratio
-	gammag := point.g*(1-ratio) + point.g*ratio
-	gammab := point.b*(1-ratio) + point.b*ratio
+	point1 := whitepoints[(temp/500)+1]
+	gammar := point.r*(1-ratio) + point1.r*ratio
+	gammag := point.g*(1-ratio) + point1.g*ratio
+	gammab := point.b*(1-ratio) + point1.b*ratio
 	setColorTemp(gammar, gammag, gammab)
 }
