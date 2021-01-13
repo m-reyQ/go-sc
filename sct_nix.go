@@ -1,3 +1,5 @@
+// +build linux freebsd
+
 package sct
 
 // #cgo CFLAGS: -I/usr/local/include
