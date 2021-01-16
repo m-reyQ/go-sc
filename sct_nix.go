@@ -1,6 +1,9 @@
+// +build linux freebsd
+
 package sct
 
-// #cgo LDFLAGS: -lX11 -lXrandr
+// #cgo CFLAGS: -I/usr/local/include
+// #cgo LDFLAGS: -L/usr/local/lib -lX11 -lXrandr
 // #include <stdio.h>
 // #include <strings.h>
 // #include <string.h>
@@ -21,8 +24,11 @@ package sct
 // RRCrtc crtcxid(RRCrtc * crtcs, int i) {
 //	 return crtcs[i];
 // }
-// void ushortSet(ushort * s, int k, ushort v) {
+// void ushortSet(ushort * s, int k, double v) {
 //	 s[k] = (ushort)v;
+// }
+// ushort* ushortCast(void* s) {
+// 	return (ushort*)s;
 // }
 // int screenCount(Display * dpy) {
 //   return XScreenCount(dpy);
@@ -46,9 +52,9 @@ func setColorTemp(gammar, gammag, gammab float64) {
 			crtc_gamma := C.XRRAllocGamma(size)
 			for i := C.int(0); i < size; i++ {
 				g := 65535.0 * float64(i) / float64(size)
-				C.ushortSet(crtc_gamma.red, i, C.ushort(g*gammar))
-				C.ushortSet(crtc_gamma.green, i, C.ushort(g*gammag))
-				C.ushortSet(crtc_gamma.blue, i, C.ushort(g*gammab))
+				C.ushortSet(C.ushortCast(unsafe.Pointer(crtc_gamma.red)), i, C.double(g*gammar))
+				C.ushortSet(C.ushortCast(unsafe.Pointer(crtc_gamma.green)), i, C.double(g*gammag))
+				C.ushortSet(C.ushortCast(unsafe.Pointer(crtc_gamma.blue)), i, C.double(g*gammab))
 			}
 			C.XRRSetCrtcGamma(dpy, crtcxid, crtc_gamma)
 			C.XFree(unsafe.Pointer(crtc_gamma))
