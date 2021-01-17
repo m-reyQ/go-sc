@@ -59,5 +59,8 @@ func setColorTemp(gammar, gammag, gammab float64) {
 			C.XRRSetCrtcGamma(dpy, crtcxid, crtc_gamma)
 			C.XFree(unsafe.Pointer(crtc_gamma))
 		}
+
+		C.XFree(unsafe.Pointer(res))
 	}
+	C.XCloseDisplay(dpy)
 }
