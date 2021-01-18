@@ -5,6 +5,7 @@ A color temperature setting library and CLI that operates in a similar way to f.
 The command line app automatically determines your location using GeoIP and adjusts the color temperature depending on time.
 
 ```sh
+$ go get -d github.com/d4l3k/go-sct/sct
 $ go install github.com/d4l3k/go-sct/sct
 
 $ sct # Launch in background
