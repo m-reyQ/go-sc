@@ -21,6 +21,7 @@ var mode = flag.String("mode", "geoip", "Mode of daemon (geoip or timed). Timed 
 var sunriseTimeStr = flag.String("sunrise-time", "06:30", "Sunrise time (HH:MM)")
 var sunsetTimeStr = flag.String("sunset-time", "21:00", "Sunset time (HH:MM)")
 var middayTimeStr = flag.String("midday-time", "14:00", "Mid day (brightest) time (HH:MM)")
+var midnight, sunriseTime, sunsetTime, middayTime time.Time
 
 func monitorGeo() {
 	log.Printf("Fetching location...")
@@ -52,28 +53,18 @@ func monitorGeo() {
 }
 
 func monitorTime() {
-	var sunriseTime, sunsetTime, middayTime time.Time
 	var monitorTemperature int
 	monitorTemperature = 6500
 
 	for {
 		curTime := time.Now()
-		midnight := time.Date(curTime.Year(), curTime.Month(), curTime.Day(), 0, 0, 0, 0, time.Local)
+		midnight = time.Date(curTime.Year(), curTime.Month(), curTime.Day(), 0, 0, 0, 0, time.Local)
 
-		if parseTime, perr := time.ParseInLocation("2006-01-02 15:04", midnight.Format("2006-01-02 ")+*sunriseTimeStr, time.Local); perr != nil {
-			log.Fatal(perr)
-		} else {
-			sunriseTime = parseTime
-		}
-		if parseTime, perr := time.ParseInLocation("2006-01-02 15:04", midnight.Format("2006-01-02 ")+*sunsetTimeStr, time.Local); perr != nil {
-			log.Fatal(perr)
-		} else {
-			sunsetTime = parseTime
-		}
-		if parseTime, perr := time.ParseInLocation("2006-01-02 15:04", midnight.Format("2006-01-02 ")+*middayTimeStr, time.Local); perr != nil {
-			log.Fatal(perr)
-		} else {
-			middayTime = parseTime
+		// Advance the day?
+		if midnight.After(sunsetTime) {
+			sunriseTime = sunriseTime.AddDate(0, 0, 1)
+			middayTime = middayTime.AddDate(0, 0, 1)
+			sunsetTime = sunsetTime.AddDate(0, 0, 1)
 		}
 
 		if curTime.After(sunriseTime) && curTime.Before(sunsetTime) {
@@ -118,6 +109,19 @@ func main() {
 		} else {
 			switch *mode {
 			case "timed":
+				curTime := time.Now()
+				midnight = time.Date(curTime.Year(), curTime.Month(), curTime.Day(), 0, 0, 0, 0, time.Local)
+				var perr error
+				if sunriseTime, perr = time.ParseInLocation("2006-01-02 15:04", midnight.Format("2006-01-02 ")+*sunriseTimeStr, time.Local); perr != nil {
+					log.Fatal(perr)
+				}
+				if sunsetTime, perr = time.ParseInLocation("2006-01-02 15:04", midnight.Format("2006-01-02 ")+*sunsetTimeStr, time.Local); perr != nil {
+					log.Fatal(perr)
+				}
+				if middayTime, perr = time.ParseInLocation("2006-01-02 15:04", midnight.Format("2006-01-02 ")+*middayTimeStr, time.Local); perr != nil {
+					log.Fatal(perr)
+				}
+
 				monitorTime()
 			default:
 				monitorGeo()
