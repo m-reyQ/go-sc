@@ -93,6 +93,20 @@ func main() {
 			sct.SetColorTemp(temp)
 		}
 	} else if len(args) == 0 {
+		// Parse time arguments
+		curTime := time.Now()
+		midnight = time.Date(curTime.Year(), curTime.Month(), curTime.Day(), 0, 0, 0, 0, time.Local)
+		var perr error
+		if sunriseTime, perr = time.ParseInLocation("2006-01-02 15:04", midnight.Format("2006-01-02 ")+*sunriseTimeStr, time.Local); perr != nil {
+			log.Fatal(perr)
+		}
+		if sunsetTime, perr = time.ParseInLocation("2006-01-02 15:04", midnight.Format("2006-01-02 ")+*sunsetTimeStr, time.Local); perr != nil {
+			log.Fatal(perr)
+		}
+		if middayTime, perr = time.ParseInLocation("2006-01-02 15:04", midnight.Format("2006-01-02 ")+*middayTimeStr, time.Local); perr != nil {
+			log.Fatal(perr)
+		}
+
 		if *daemon {
 			args := os.Args[1:]
 			for i := 0; i < len(args); i++ {
@@ -109,19 +123,6 @@ func main() {
 		} else {
 			switch *mode {
 			case "timed":
-				curTime := time.Now()
-				midnight = time.Date(curTime.Year(), curTime.Month(), curTime.Day(), 0, 0, 0, 0, time.Local)
-				var perr error
-				if sunriseTime, perr = time.ParseInLocation("2006-01-02 15:04", midnight.Format("2006-01-02 ")+*sunriseTimeStr, time.Local); perr != nil {
-					log.Fatal(perr)
-				}
-				if sunsetTime, perr = time.ParseInLocation("2006-01-02 15:04", midnight.Format("2006-01-02 ")+*sunsetTimeStr, time.Local); perr != nil {
-					log.Fatal(perr)
-				}
-				if middayTime, perr = time.ParseInLocation("2006-01-02 15:04", midnight.Format("2006-01-02 ")+*middayTimeStr, time.Local); perr != nil {
-					log.Fatal(perr)
-				}
-
 				monitorTime()
 			default:
 				monitorGeo()
