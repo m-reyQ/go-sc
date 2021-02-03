@@ -1,5 +1,7 @@
 package sct
 
+import "runtime"
+
 type color struct {
 	r, g, b float64
 }
@@ -30,6 +32,14 @@ var whitepoints = []color{
 
 // SetColorTemp changes the monitor colors to reflect the specified color temperature.
 func SetColorTemp(temp int) {
+	// An attempt to fix https://github.com/d4l3k/go-sct/issues/9
+	if runtime.GOOS == "windows" {
+		setColorTemp(temp + 1)
+	}
+	setColorTemp(temp)
+}
+
+func setColorTemp(temp int) {
 	if temp < 1000 || temp > 10000 {
 		temp = 6500
 	}
@@ -40,5 +50,5 @@ func SetColorTemp(temp int) {
 	gammar := point.r*(1-ratio) + point1.r*ratio
 	gammag := point.g*(1-ratio) + point1.g*ratio
 	gammab := point.b*(1-ratio) + point1.b*ratio
-	setColorTemp(gammar, gammag, gammab)
+	setColorGamma(gammar, gammag, gammab)
 }

@@ -5,8 +5,8 @@ import (
 	"unsafe"
 )
 
-// setColorTemp changes the device gamma curve colors to reflect the specified color temperature.
-func setColorTemp(gammar, gammag, gammab float64) {
+// setColorGamma changes the device gamma curve colors to reflect the specified color temperature.
+func setColorGamma(gammar, gammag, gammab float64) {
 	user32 := syscall.NewLazyDLL("User32.dll")
 	gdi32 := syscall.NewLazyDLL("Gdi32.dll")
 	procGetDC := user32.NewProc("GetDC")

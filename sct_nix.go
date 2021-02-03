@@ -36,8 +36,8 @@ package sct
 import "C"
 import "unsafe"
 
-// setColorTemp changes the Xrandr colors to reflect the specified color temperature.
-func setColorTemp(gammar, gammag, gammab float64) {
+// setColorGamma changes the Xrandr colors to reflect the specified color temperature.
+func setColorGamma(gammar, gammag, gammab float64) {
 	dpy := C.XOpenDisplay(nil)
 	screenCount := C.screenCount(dpy)
 	for screen := C.int(0); screen < screenCount; screen++ {
