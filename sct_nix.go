@@ -1,9 +1,9 @@
-// +build linux freebsd
+// +build linux freebsd openbsd
 
 package sct
 
-// #cgo CFLAGS: -I/usr/local/include
-// #cgo LDFLAGS: -L/usr/local/lib -lX11 -lXrandr
+// #cgo CFLAGS: -I/usr/X11R6/include -I/usr/local/include
+// #cgo LDFLAGS: -L/usr/X11R6/lib -L/usr/local/lib -lX11 -lXrandr
 // #include <stdio.h>
 // #include <strings.h>
 // #include <string.h>
