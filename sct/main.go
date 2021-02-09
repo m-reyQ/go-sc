@@ -2,9 +2,11 @@ package main
 
 import (
 	"flag"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -29,12 +31,12 @@ func monitorGeo() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf(" - City: %s, Lat: %f, Lon: %f", geo.City, geo.Lat, geo.Lon)
+	log.Printf(" - City: %s, Lat: %f, Lon: %f", geo.City, geo.Latitude, geo.Longitude)
 	log.Printf("Monitoring daylight settings...")
 	var lastState *bool
 	for {
-		rise := astrotime.NextSunrise(time.Now(), geo.Lat, -geo.Lon)
-		set := astrotime.NextSunset(time.Now(), geo.Lat, -geo.Lon)
+		rise := astrotime.NextSunrise(time.Now(), geo.Latitude, -geo.Longitude)
+		set := astrotime.NextSunset(time.Now(), geo.Latitude, -geo.Longitude)
 		state := rise.Before(set)
 		if lastState != nil && state == *lastState {
 			time.Sleep(1 * time.Minute)
@@ -43,13 +45,59 @@ func monitorGeo() {
 		lastState = &state
 		if state {
 			log.Print("Good night!")
-			sct.SetColorTemp(*nightTemp)
+			if err := interpolateColorTemp(*nightTemp); err != nil {
+				log.Fatalf("%+v", err)
+			}
 		} else {
 			log.Print("Good morning!")
-			sct.SetColorTemp(*dayTemp)
+			if err := interpolateColorTemp(*dayTemp); err != nil {
+				log.Fatalf("%+v", err)
+			}
 		}
-		time.Sleep(1 * time.Minute)
 	}
+}
+
+var (
+	totalTime = 3 * time.Second
+	stepEvery = 1 * time.Second / 60
+)
+
+func interpolateColorTemp(new int) error {
+	old, err := getCurrentColorTemp()
+	if err != nil {
+		return err
+	}
+
+	steps := int(totalTime / stepEvery)
+	stepSize := (new - old) / steps
+	for i := 0; i < steps; i++ {
+		c := time.After(stepEvery)
+		sct.SetColorTemp(old + stepSize*i)
+		<-c
+	}
+	sct.SetColorTemp(new)
+
+	return saveCurrentColorTemp(new)
+}
+
+func tempFile() string {
+	display := os.Getenv("DISPLAY")
+	return filepath.Join(os.TempDir(), "sct-temp-"+display)
+}
+
+func saveCurrentColorTemp(temp int) error {
+	return ioutil.WriteFile(tempFile(), []byte(strconv.Itoa(temp)), 0644)
+}
+
+func getCurrentColorTemp() (int, error) {
+	body, err := ioutil.ReadFile(tempFile())
+	if os.IsNotExist(err) {
+		return *dayTemp, nil
+	} else if err != nil {
+		return 0, err
+	}
+
+	return strconv.Atoi(string(body))
 }
 
 func monitorTime() {
@@ -90,7 +138,9 @@ func main() {
 	args := flag.Args()
 	if len(args) == 1 {
 		if temp, err := strconv.Atoi(args[0]); err == nil {
-			sct.SetColorTemp(temp)
+			if err := interpolateColorTemp(temp); err != nil {
+				log.Fatalf("%+v", err)
+			}
 		}
 	} else if len(args) == 0 {
 		// Parse time arguments

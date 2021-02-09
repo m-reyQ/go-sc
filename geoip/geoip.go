@@ -3,24 +3,42 @@ package geoip
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 )
 
 type GeoIP struct {
-	// The right side is the name of the JSON variable
-	Ip          string  `json:"ip"`
-	CountryCode string  `json:"country_code"`
-	CountryName string  `json:"country_name"`
-	RegionCode  string  `json:"region_code"`
-	RegionName  string  `json:"region_name"`
-	City        string  `json:"city"`
-	Zipcode     string  `json:"zipcode"`
-	Lat         float64 `json:"latitude"`
-	Lon         float64 `json:"longitude"`
-	MetroCode   int     `json:"metro_code"`
-	AreaCode    int     `json:"area_code"`
+	IP            string  `json:"ip"`
+	Type          string  `json:"type"`
+	ContinentCode string  `json:"continent_code"`
+	ContinentName string  `json:"continent_name"`
+	CountryCode   string  `json:"country_code"`
+	CountryName   string  `json:"country_name"`
+	RegionCode    string  `json:"region_code"`
+	RegionName    string  `json:"region_name"`
+	City          string  `json:"city"`
+	Zip           string  `json:"zip"`
+	Latitude      float64 `json:"latitude"`
+	Longitude     float64 `json:"longitude"`
+	Location      struct {
+		GeonameID int    `json:"geoname_id"`
+		Capital   string `json:"capital"`
+		Languages []struct {
+			Code   string `json:"code"`
+			Name   string `json:"name"`
+			Native string `json:"native"`
+		} `json:"languages"`
+		CountryFlag             string `json:"country_flag"`
+		CountryFlagEmoji        string `json:"country_flag_emoji"`
+		CountryFlagEmojiUnicode string `json:"country_flag_emoji_unicode"`
+		CallingCode             string `json:"calling_code"`
+		IsEu                    bool   `json:"is_eu"`
+	} `json:"location"`
 }
+
+// APIKey is the API key to use for looking up the ip addresses.
+var APIKey = "92dd0c8e9da13e9d292af57c86ba348e"
 
 var (
 	address  string
@@ -32,9 +50,10 @@ var (
 
 // LookupIP looks up the geolocation information for the specified address ("" for current host).
 func LookupIP(address string) (*GeoIP, error) {
-	// Use freegeoip.net to get a JSON response
-	// There is also /xml/ and /csv/ formats available
-	response, err = http.Get("https://freegeoip.net/json/" + address)
+	if address == "" {
+		address = "check"
+	}
+	response, err = http.Get(fmt.Sprintf("http://api.ipstack.com/%s?access_key=%s&output=json", address, APIKey))
 	if err != nil {
 		return nil, err
 	}
