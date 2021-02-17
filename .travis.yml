@@ -1,3 +1,9 @@
 language: go
 go: 1.10.x
 script: xvfb-run go test ./...
+addons:
+  apt:
+    packages:
+    - xorg-dev
+    - libglu1-mesa-dev
+
