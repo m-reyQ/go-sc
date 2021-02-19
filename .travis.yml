@@ -1,6 +1,6 @@
 language: go
 go: 1.10.x
-script: xvfb-run go test ./...
+script: xvfb-run --server-args="+extension RANDR -screen 0 1024x768x24" go test ./...
 addons:
   apt:
     packages:
