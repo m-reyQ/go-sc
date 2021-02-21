@@ -1,6 +1,15 @@
+sudo: required
+
+services:
+  - docker
+
 language: go
 go: 1.10.x
-script: xvfb-run --server-args="+extension RANDR -screen 0 1024x768x24" go test ./...
+
+script:
+  - docker build -t sct .
+  - docker run --rm -it sct ./test.sh
+
 addons:
   apt:
     packages:
